@@ -1,7 +1,8 @@
 novartis-datathon-2021
 ==============================
 
-novartis-datathon-2021
+Novartis datathon 2021 edition 
+https://godatathon.com/
 
 Project Organization
 ------------
