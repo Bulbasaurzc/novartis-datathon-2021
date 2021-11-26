@@ -1,5 +1,17 @@
-def extract_activity_features(raw_activity: pd.DataFrame) -> pd.DataFrame:
+import pandas as pd
+import numpy as np
 
+def add_month(month):
+    '''Given a string with month format of YYYY-MM add one month'''
+
+    if (int(month[5:])<12):
+        if (int(month[5:]) + 1 >= 10):
+            return month[:5] + str(int(month[5:]) + 1)
+        return month[:5] + '0' + str(int(month[5:]) + 1)
+    return str(int(month[:4]) + 1) + '-01'
+
+def extract_activity_features(raw_activity: pd.DataFrame) -> pd.DataFrame:
+    raw_activity = raw_activity.rename(columns = {'count':'counts'})
     raw_activity.sort_values('month', inplace = True)
     
     #activities to different specialty per month
