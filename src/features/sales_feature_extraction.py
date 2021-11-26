@@ -57,7 +57,6 @@ def extract_sales_features(raw_sales: pd.DataFrame) -> pd.DataFrame:
     sales3.month = sales3.month.apply(lambda x: add_month(x))
     sales3.columns = ['month', 'region', 'sales_region_b3_1mo', 'sales_region_b3market_1mo', 'sales_region_b12market_1mo']
     
-    
     # Combine all sales features in a unique dataset
     
     sales_features = sales_features.merge(universe_features, how = 'left', on = 'month')
@@ -72,10 +71,23 @@ def extract_sales_features(raw_sales: pd.DataFrame) -> pd.DataFrame:
         sales_features[c[:-3] + '2mo'] = sales_features.groupby(['region', 'brand'])[c].shift()
         sales_features[c[:-3] + '3mo'] = sales_features.groupby(['region', 'brand'])[c].shift(2)
         sales_features[c[:-3] + '4mo'] = sales_features.groupby(['region', 'brand'])[c].shift(3)
+        sales_features[c[:-3] + '5mo'] = sales_features.groupby(['region', 'brand'])[c].shift(4)
+        sales_features[c[:-3] + '6mo'] = sales_features.groupby(['region', 'brand'])[c].shift(5)
         
         sales_features[ c[:-3] + 'trend_2mo'] = sales_features[c[:-3] + '2mo'] / (sales_features[c[:-3] + '1mo']+1)
         sales_features[c[:-3] + 'trend_3mo'] = sales_features[c[:-3] + '3mo'] / (sales_features[c[:-3] + '1mo']+1)
         sales_features[ c[:-3] + 'trend_4mo'] = sales_features[c[:-3] + '4mo'] / (sales_features[c[:-3] + '1mo']+1)
+        sales_features[ c[:-3] + 'trend_5mo'] = sales_features[c[:-3] + '5mo'] / (sales_features[c[:-3] + '1mo']+1)
+        sales_features[ c[:-3] + 'trend_6mo'] = sales_features[c[:-3] + '6mo'] / (sales_features[c[:-3] + '1mo']+1)
+        
+        sales_features[c[:-3] + 'cumsum'] = sales_features[[c[:-3] + '1mo',c[:-3] + '2mo',c[:-3] + '3mo',
+                                                            c[:-3] + '4mo',c[:-3] + '5mo',c[:-3] + '6mo']].sum(axis = 1)
+        sales_features[c[:-3] + 'cummax'] = sales_features[[c[:-3] + '1mo',c[:-3] + '2mo',c[:-3] + '3mo',
+                                                            c[:-3] + '4mo',c[:-3] + '5mo',c[:-3] + '6mo']].max(axis = 1)
+        sales_features[c[:-3] + 'cummin'] = sales_features[[c[:-3] + '1mo',c[:-3] + '2mo',c[:-3] + '3mo',
+                                                            c[:-3] + '4mo',c[:-3] + '5mo',c[:-3] + '6mo']].min(axis = 1)
+        sales_features[c[:-3] + 'cumstd'] = sales_features[[c[:-3] + '1mo',c[:-3] + '2mo',c[:-3] + '3mo',
+                                                            c[:-3] + '4mo',c[:-3] + '5mo',c[:-3] + '6mo']].std(axis = 1)
     
     return sales_features
     
