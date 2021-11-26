@@ -4,15 +4,20 @@ import pandas as pd
 import lightgbm as lgb
 from sklearn.model_selection import train_test_split
 
-def train_model(X, target_name = 'y', model_type = 'lgb-regression', params = 'default', 
+def train_model(X, target_name = 'y', model_type = 'lgb-regression', params = 'default', split = 'in_sample',
                 objective = 'regression', metric = 'rmse', quantile_alpha = 0.5, save_path = ''):
     '''returns model and saves log parameters'''
   
- 
-    X_tr = X[X['train'] == 1].drop(columns = [target_name, 'train'])
-    X_val = X[X['train'] != 1].drop(columns = [target_name, 'train'])
-    y_train = X[X['train'] == 1][target_name]
-    y_val = X[X['train'] != 1][target_name]
+
+    if (split == 'in_sample'):
+        X_tr, X_val, y_train, y_val = train_test_split(X.drop(columns = [target_name, 'train']), 
+                                                       X[target_name], 
+                                                       test_size = 0.1, random_state = 1926)
+    else:
+        X_tr = X[X['train'] == 1].drop(columns = [target_name, 'train'])
+        X_val = X[X['train'] != 1].drop(columns = [target_name, 'train'])
+        y_train = X[X['train'] == 1][target_name]
+        y_val = X[X['train'] != 1][target_name]
 
     if (params == 'default'):
         params = {'num_leaves': 54, 'min_data_in_leaf': 79, 'objective': objective,
