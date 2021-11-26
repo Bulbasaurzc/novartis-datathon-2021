@@ -136,4 +136,19 @@ def extract_activity_features(raw_activity: pd.DataFrame) -> pd.DataFrame:
         activity_features[c[:-3] + 'trend_3mo'] = activity_features[c[:-3] + '3mo'] / (activity_features[c[:-3] + '1mo']+1)
         activity_features[ c[:-3] + 'trend_4mo'] = activity_features[c[:-3] + '4mo'] / (activity_features[c[:-3] + '1mo']+1)
     
+    months = pd.DataFrame({'month': raw_activity.month.unique()})
+    regions = pd.DataFrame({'region': raw_activity.region.unique()})
+    brands = pd.DataFrame({'brand': ['brand_1', 'brand_2']})
+
+    months['dummy_col'] = 0
+    regions['dummy_col'] = 0
+    brands['dummy_col'] = 0
+
+    activity_features_full = months.merge(regions, how = 'outer', on = 'dummy_col')
+    activity_features_full = activity_features_full.merge(brands, how = 'outer', on = 'dummy_col')
+    activity_features_full.drop(columns = 'dummy_col', inplace = True)
+    activity_features_full.sort_values('month', inplace = True)
+    activity_features = activity_features.merge(activity_features_full,how='outer',on=['month','region','brand'])
+    activity_features = activity_features.fillna(0)
+    
     return activity_features
