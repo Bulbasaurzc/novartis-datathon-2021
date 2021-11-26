@@ -56,12 +56,6 @@ def extract_sales_features(raw_sales: pd.DataFrame) -> pd.DataFrame:
     sales3 = sales3[['month', 'region', 'brand_3', 'brand_3_market', 'brand_12_market']]
     sales3.month = sales3.month.apply(lambda x: add_month(x))
     sales3.columns = ['month', 'region', 'sales_region_b3_1mo', 'sales_region_b3market_1mo', 'sales_region_b12market_1mo']
-
-    ### 
-    
-    
-    
-    # Features scaled by overall market increase / decrease
     
     
     # Combine all sales features in a unique dataset
