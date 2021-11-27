@@ -9,6 +9,7 @@ def add_month(month):
             return month[:5] + str(int(month[5:]) + 1)
         return month[:5] + '0' + str(int(month[5:]) + 1)
     return str(int(month[:4]) + 1) + '-01'
+
 def extract_rtes_features(raw_rtes: pd.DataFrame) -> pd.DataFrame:
     raw_rtes=raw_rtes.fillna(0)
     raw_rtes['time_sent'] = pd.to_datetime(raw_rtes.time_sent, format='%Y-%m-%d')
