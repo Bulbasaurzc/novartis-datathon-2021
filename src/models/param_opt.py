@@ -4,7 +4,7 @@ import pandas as pd
 from bayes_opt import BayesianOptimization
 
 def bayes_parameter_opt_lgb(X, y, init_round=15, opt_round=3, n_folds=5, random_seed=6, n_estimators=10000, 
-                            learning_rate=0.01, save_path = ''):
+                            learning_rate=0.01, save_path = '', metric = 'rmse'):
 
     train_data = lgb.Dataset(data=X, label=y, free_raw_data=False, categorical_feature=[c for c in X if 'categorical' in c])
 
@@ -15,7 +15,7 @@ def bayes_parameter_opt_lgb(X, y, init_round=15, opt_round=3, n_folds=5, random_
                   'num_iterations': n_estimators, 
                   'learning_rate':learning_rate,
                   'early_stopping_round': 100, 
-                  'metric':'rmse',
+                  'metric': metric,
                   'verbose': -1,
                   'random_state': random_seed}
         
@@ -28,8 +28,8 @@ def bayes_parameter_opt_lgb(X, y, init_round=15, opt_round=3, n_folds=5, random_
         params['min_split_gain'] = min_split_gain
         params['min_child_weight'] = min_child_weight
         cv_result = lgb.cv(params, train_data, nfold=n_folds, seed=random_seed, verbose_eval = 200, 
-                           metrics=['rmse'], stratified = False)
-        return -cv_result['rmse-mean'][-1]
+                           metrics=[metric], stratified = False)
+        return -cv_result['l1-mean'][-1]
 
     lgbBO = BayesianOptimization(lgb_eval, {'num_leaves': (15, 45),
                                             'feature_fraction': (0.1, 0.9),
