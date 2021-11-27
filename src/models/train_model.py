@@ -34,7 +34,7 @@ def train_model(X, target_name = 'y', model_type = 'lgb-regression', params = 'd
         
         model = lgb.train(params, 
                           X_train_lgb,
-                          num_boost_round = 1000,
+                          num_boost_round = 10000,
                           valid_sets = [X_train_lgb, X_val_lgb],
                           early_stopping_rounds = 20)
         
@@ -50,7 +50,7 @@ def train_model(X, target_name = 'y', model_type = 'lgb-regression', params = 'd
         
         model = lgb.train(params, 
                           X_train_lgb,
-                          num_boost_round = 1000,
+                          num_boost_round = 10000,
                           valid_sets = [X_train_lgb, X_val_lgb],
                           early_stopping_rounds = 20)
         
