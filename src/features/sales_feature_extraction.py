@@ -42,8 +42,7 @@ def extract_sales_features(raw_sales: pd.DataFrame) -> pd.DataFrame:
                                  'sales_univ_b3_market_1mo']
     universe_features['sales_univ_1mo'] = universe_features.sum(axis = 1)
     universe_features['sales_univ_market_1mo'] = (universe_features['sales_univ_b12_market_1mo'] + 
-                                                  universe_features['sales_univ_b3_market_1mo'] )
-    
+                                                  universe_features['sales_univ_b3_market_1mo'])
     
     ### Universe sales of previous periods for the 150 regions in the train set at a month-brand level
     
@@ -56,6 +55,10 @@ def extract_sales_features(raw_sales: pd.DataFrame) -> pd.DataFrame:
     sales3 = sales3[['month', 'region', 'brand_3', 'brand_3_market', 'brand_12_market']]
     sales3.month = sales3.month.apply(lambda x: add_month(x))
     sales3.columns = ['month', 'region', 'sales_region_b3_1mo', 'sales_region_b3market_1mo', 'sales_region_b12market_1mo']
+    
+    sales3['sales_regionb3dividedb3market_1mo'] = sales3['sales_region_b3_1mo'] / (sales3['sales_region_b3market_1mo']+1)
+    sales3['sales_regionb3dividedb12market_1mo'] = sales3['sales_region_b3_1mo'] / (sales3['sales_region_b12market_1mo']+1)
+    sales3['sales_regionb3marketdividedb12market_1mo'] = sales3['sales_region_b3market_1mo'] / (sales3['sales_region_b12market_1mo']+1)
     
     # Combine all sales features in a unique dataset
     
@@ -74,6 +77,10 @@ def extract_sales_features(raw_sales: pd.DataFrame) -> pd.DataFrame:
         sales_features[c[:-3] + '5mo'] = sales_features.groupby(['region', 'brand'])[c].shift(4)
         sales_features[c[:-3] + '6mo'] = sales_features.groupby(['region', 'brand'])[c].shift(5)
         
+        sales_features[c[:-3] + 'cumsum_2'] = sales_features[[c[:-3] + '1mo',c[:-3] + '2mo']].sum(axis = 1)
+        sales_features[c[:-3] + 'cumsum_3'] = sales_features[[c[:-3] + '1mo',c[:-3] + '2mo',c[:-3] + '3mo']].sum(axis = 1)
+        
+        
         sales_features[ c[:-3] + 'trend_2mo'] = sales_features[c[:-3] + '2mo'] / (sales_features[c[:-3] + '1mo']+1)
         sales_features[c[:-3] + 'trend_3mo'] = sales_features[c[:-3] + '3mo'] / (sales_features[c[:-3] + '1mo']+1)
         sales_features[ c[:-3] + 'trend_4mo'] = sales_features[c[:-3] + '4mo'] / (sales_features[c[:-3] + '1mo']+1)
@@ -88,6 +95,10 @@ def extract_sales_features(raw_sales: pd.DataFrame) -> pd.DataFrame:
                                                             c[:-3] + '4mo',c[:-3] + '5mo',c[:-3] + '6mo']].min(axis = 1)
         sales_features[c[:-3] + 'cumstd'] = sales_features[[c[:-3] + '1mo',c[:-3] + '2mo',c[:-3] + '3mo',
                                                             c[:-3] + '4mo',c[:-3] + '5mo',c[:-3] + '6mo']].std(axis = 1)
+        
+        for m in ['2mo', '3mo', '4mo', '5mo', '6mo']:
+            sales_features[c[:-3] + 'ratio_' + m] = sales_features[c[:-3] + m] / (sales_features[c[:-3] + 'cumsum'] +1)
+            sales_features[c[:-3] + 'ratio3_' + m] = sales_features[c[:-3] + m] / (sales_features[c[:-3] + 'cumsum_3'] +1)
     
     return sales_features
     
